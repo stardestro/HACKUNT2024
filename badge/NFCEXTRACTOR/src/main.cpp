@@ -84,30 +84,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define YPOS   1
 #define DELTAY 2
 
-
-void updateScreen(int time){
-  display.clearDisplay();
-
-  display.setTextSize(1);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  // display.cp437(true);         // Use full 256 char 'Code Page 437' font
-
-  // Not all the characters will fit on the display. This is normal.
-  // Library will draw what it can and the rest will be clipped.
-  // for(int16_t i=0; i<256; i++) {
-  //   if(i == '\n') display.write(' ');
-  //   else          display.write(i);
-  // }
-
-  display.printf(
-    "time %d", time
-  );
-
-  display.display();
-  // delay(2000);
-}
-
 void displayUUID(uint8_t uid[], int uuidlength){
   display.clearDisplay();
   display.setTextSize(1);      // Normal 1:1 pixel scale

@@ -34,15 +34,4 @@ uint8_t assignedtablesUUID[MAX_PROJECTS][CONFIG_UUID_LENGTH] = {
     { 4, 0, 0, 0, 0, 0, 0}
 };
 
-
-
-// int numberoftables = (sizeof(assignedtables)/sizeof(assignedtables[0]));
-
-
-// Type definitions
-typedef struct {
-    int id;
-    char name[50];
-} MyStruct;
-
 #endif // CONFIG_H  // Include guard end

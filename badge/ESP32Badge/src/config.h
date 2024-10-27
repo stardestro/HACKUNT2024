@@ -15,8 +15,8 @@
 
 #define MAX_PROJECTS 9
 
-int assignedtables[] = {1, 250, 3, 454, 5, 0, 0, 10, 10, 10};
-bool assignedtablescheck[] = { true, false, true, true, false , false, false, false, false, false};
+int assignedtables[] = {1, 2, 3, 4, 260, 0, 0, 10, 10, 10};
+bool assignedtablescheck[] = { false, false, false, false, false , false, false, false, false, false};
 int numberoftables = CONFIG_NUMBER_OF_TABLES;
 
 #define CONFIG_UUID_LENGTH 7

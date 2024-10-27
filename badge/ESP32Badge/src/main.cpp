@@ -391,7 +391,7 @@ void loop() {
     products from Adafruit!
 */
 /**************************************************************************/
-// #define PN532DEBUG
+#define PN532DEBUG
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_PN532.h>
@@ -559,7 +559,7 @@ void showTablesa(bool hasrunoutoftime, int timeleft, bool startedclock){
   }
   if (startedclock)
   {
-    display.setCursor(14*6, 24);
+    display.setCursor(14*5, 24);
     if (hasrunoutoftime)
     {
       display.print("TIMEOUT");
@@ -578,6 +578,7 @@ void showTablesa(bool hasrunoutoftime, int timeleft, bool startedclock){
     }
   }
   display.display();
+  // delay(500);
   // Serial.println("TEST");
 }
 
@@ -610,7 +611,31 @@ void AlarmToggle(){
   // delay(10);
 }
 
+bool compareUUID(uint8_t uid_A[CONFIG_UUID_LENGTH], uint8_t uid_B[CONFIG_UUID_LENGTH], uint8_t uidLength){
+  for (int i = 0; i < uidLength; i++)
+  {
+    if (uid_A[i] != uid_B[i])
+    {
+      return false;
+    }
+  }
+  return true;
+}
 
+int checkforUUIDinArray(uint8_t uid_A[MAX_PROJECTS][CONFIG_UUID_LENGTH], uint8_t uid_B[CONFIG_UUID_LENGTH], uint8_t uidLength){
+  for (int i = 0; i < MAX_PROJECTS; i++)
+  {
+    uint8_t temp[CONFIG_UUID_LENGTH];
+    for (int j = 0; j < CONFIG_UUID_LENGTH; j++)
+    {
+      temp[j] = uid_A[i][j];
+      if(compareUUID(temp,uid_B,uidLength)){
+        return i;
+      }
+    }
+  }
+  return -1;
+}
 
 void setup(void) {
   Serial.begin(115200);
@@ -627,7 +652,7 @@ void setup(void) {
 
   // Show initial display buffer contents on the screen --
   // the library initializes this with an Adafruit splash screen.
-  display.display();
+  // display.display();
   delay(500); // Pause for 500 miliseconds
   display.cp437(true);         // Use full 256 char 'Code Page 437' font
 
@@ -668,35 +693,41 @@ void loop(void) {
 
   // Serial.println("SCANNING");
 
-  if(nfc.inListPassiveTarget())
-  {
-    success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+  // if(nfc.inListPassiveTarget())
+  // {
 
-    if (success) {
-      Alarm();
-      Serial.println("Found a card!");
-      Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
-      Serial.print("UID Value: ");
-      for (uint8_t i=0; i < uidLength; i++)
-      {
-        Serial.print(" 0x");Serial.print(uid[i], HEX);
-      }
-      Serial.println("");
-      // Wait 1 second before continuing
-      delay(1000);
-      // displayUUID(uid,uidLength);
-    }
-    else
+  nfc.setPassiveActivationRetries(0x20);
+
+  success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, &uid[0], &uidLength);
+  // Serial.println("Attempting scan");
+  if (success) {
+    Alarm();
+    Serial.println("Found a card!");
+    Serial.print("UID Length: ");Serial.print(uidLength, DEC);Serial.println(" bytes");
+    Serial.print("UID Value: ");
+    for (uint8_t i=0; i < uidLength; i++)
     {
-      // PN532 probably timed out waiting for a card
-      Serial.println("Timed out waiting for a card");
-      // displayNoUUID();
+      Serial.print(" 0x");Serial.print(uid[i], HEX);
     }
-  }
+    Serial.println("");
+    // Wait 1 second before continuing
+    // delay(1000);
+    nfc.setPassiveActivationRetries(0x20);
+    // displayUUID(uid,uidLength);
+    uint8_t value[] = { 4, 4, 30, 73, 42, 116, 128};
+    Serial.print("COMPARERESULT=");
+    Serial.print(compareUUID(value, uid,uidLength));
+    Serial.print("checkforUUIDinArray=");
+    int checkforUUIDinArraytemp = checkforUUIDinArray(assignedtablesUUID,uid,uidLength);
+    Serial.print(checkforUUIDinArraytemp);
+    assignedtablescheck[checkforUUIDinArraytemp] = true;
 
-  if (success)
-  {
-    currentMode = 1;
+
+    if (currentMode != 1)
+    {
+      currentMode = 1;
+    }
+    timesetpoint = millis();
   }
   
 
@@ -711,8 +742,6 @@ void loop(void) {
   {
     case 0:
       showTablesa(false, 0, false);
-
-      // TODO NFC and set scanned to true
       break;
 
     case 1:
@@ -746,14 +775,11 @@ void loop(void) {
       {
         currentMode = 4;
       }
-
-      // TODO NFC and set scanned to true
       break;
 
     case 4:
       showTablesa(true, 0, true);
       AlarmToggle();
-      // TODO NFC and set scanned to true
       break;  
     default:
       break;

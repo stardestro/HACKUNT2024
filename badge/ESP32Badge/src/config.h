@@ -13,11 +13,16 @@
 // assign 5 - 9 tables max per round
 #define CONFIG_NUMBER_OF_TABLES 5
 
+#define MAX_PROJECTS 9
+
 int assignedtables[] = {1, 250, 3, 454, 5, 0, 0, 10, 10, 10};
 bool assignedtablescheck[] = { true, false, true, true, false , false, false, false, false, false};
 int numberoftables = CONFIG_NUMBER_OF_TABLES;
 
-uint8_t assignedtablesUUID[9][7] = {
+#define CONFIG_UUID_LENGTH 7
+
+
+uint8_t assignedtablesUUID[MAX_PROJECTS][CONFIG_UUID_LENGTH] = {
     { 4, 122, 208, 5, 57, 108, 128},
     { 4, 4, 30, 73, 42, 116, 128},
     { 4, 116, 30, 154, 42, 116, 128},
